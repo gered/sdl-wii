@@ -76,14 +76,14 @@ test-clean:
 $(LIB_DIR)/libSDL.a: $(SDL_OBJS)
 	@echo Archiving $@
 	@-mkdir -p $(dir $@)
-	powerpc-eabi-ar crs $@ $(SDL_OBJS)
+	@$(DEVKITPPC)/bin/powerpc-eabi-ar crs $@ $(SDL_OBJS)
 	@echo ----
 
 # How to build a DOL.
 $(BIN_DIR)/%.dol: $(TEST_OBJ_DIR)/%.elf
 	@echo Creating DOL $@
 	@-mkdir -p $(dir $@)
-	elf2dol $< $@
+	@$(DEVKITPPC)/bin/elf2dol $< $@
 	@echo ----
 
 # Compilation flags.
@@ -99,4 +99,4 @@ LDFLAGS			:= $(COMMON_FLAGS) -L$(LIB_DIR) -L$(LIBOGC_LIB) -lSDL -lwiikeyboard -l
 $(SDL_OBJ_DIR)/%.o: $(SDL_SRC_DIR)/%.c
 	@echo Compiling $<
 	@-mkdir -p $(dir $@)
-	powerpc-eabi-gcc $(CFLAGS) -c $< -o $@ $(PIPE_TO_SED)
+	@$(DEVKITPPC)/bin/powerpc-eabi-gcc $(CFLAGS) -c $< -o $@ $(PIPE_TO_SED)

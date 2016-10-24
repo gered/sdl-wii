@@ -45,7 +45,7 @@ install: all
 $(LIB_DIR)/libSDL_net.a: $(OBJS)
 	@echo Archiving $@
 	@-mkdir -p $(dir $@)
-	@powerpc-eabi-ar crs $@ $(OBJS)
+	@$(DEVKITPPC)/bin/powerpc-eabi-ar crs $@ $(OBJS)
 	@echo ----
 
 # How to copy a header file
@@ -71,4 +71,4 @@ LDFLAGS			:= $(COMMON_FLAGS) -L$(LIB_DIR) -L$(LIBOGC_LIB) -lSDL -lfat -lwiiuse -
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	@echo Compiling $<
 	@-mkdir -p $(dir $@)
-	@powerpc-eabi-gcc $(CFLAGS) -c $< -o $@ $(PIPE_TO_SED)
+	@$(DEVKITPPC)/bin/powerpc-eabi-gcc $(CFLAGS) -c $< -o $@ $(PIPE_TO_SED)

@@ -63,14 +63,14 @@ install: all
 $(LIB_DIR)/libSDL_mixer.a: $(OBJS)
 	@echo Archiving $@
 	@-mkdir -p $(dir $@)
-	@powerpc-eabi-ar crs $@ $(OBJS)
+	@$(DEVKITPPC)/bin/powerpc-eabi-ar crs $@ $(OBJS)
 	@echo ----
 	
 # How to build a DOL.
 $(BIN_DIR)/%.dol: $(TEST_OBJ_DIR)/%.elf
 	@echo Creating DOL $@
 	@-mkdir -p $(dir $@)
-	elf2dol $< $@
+	@$(DEVKITPPC)/bin/elf2dol $< $@
 	@echo ----
 
 # How to copy a header file
@@ -99,7 +99,7 @@ LDFLAGS			:= $(COMMON_FLAGS) -L$(LIB_DIR) -L$(LIBOGC_LIB) -L$(DEVKITPRO)/libsmpe
 $(TEST_OBJ_DIR)/%.elf: $(TEST_OBJ_DIR)/%.o $(LIB_DIR)/libSDL_mixer.a $(DEVKITPRO)/libSDL/lib/libSDL.a
 	@echo Linking $@
 	@-mkdir -p $(dir $@)
-	powerpc-eabi-g++ -o $@ $< $(LDFLAGS)
+	@$(DEVKITPPC)/bin/powerpc-eabi-g++ -o $@ $< $(LDFLAGS)
 	#keep elf for debugging
 	#cp $@ /tmp/elf
 
@@ -107,10 +107,10 @@ $(TEST_OBJ_DIR)/%.elf: $(TEST_OBJ_DIR)/%.o $(LIB_DIR)/libSDL_mixer.a $(DEVKITPRO
 $(TEST_OBJ_DIR)/%.o: $(TEST_SRC_DIR)/playmus.c $(TEST_SRC_DIR)/playwave.c
 	@echo Compiling $<
 	@-mkdir -p $(dir $@)
-	powerpc-eabi-gcc $(CFLAGS) -c $< -o $@ $(PIPE_TO_SED)
+	@$(DEVKITPPC)/bin/powerpc-eabi-gcc $(CFLAGS) -c $< -o $@ $(PIPE_TO_SED)
 
 # How to compile C file (SDL library).
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	@echo Compiling $<
 	@-mkdir -p $(dir $@)
-	@powerpc-eabi-gcc $(CFLAGS) -c $< -o $@ $(PIPE_TO_SED)
+	@$(DEVKITPPC)/bin/powerpc-eabi-gcc $(CFLAGS) -c $< -o $@ $(PIPE_TO_SED)
