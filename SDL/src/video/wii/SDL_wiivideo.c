@@ -145,6 +145,10 @@ draw_init ()
 	else
 		GX_InitTexObj (&texobj, texturemem, currentwidth, currentheight, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
 
+	// for sharper pixels. otherwise there is a noticeable blur applied to the entire image
+	// due to the default linear/bilinear default filtering
+	GX_InitTexObjFilterMode(&texobj, GX_NEAR, GX_NEAR);
+
 	GX_LoadTexObj (&texobj, GX_TEXMAP0);	// load texture object so its ready to use
 }
 
