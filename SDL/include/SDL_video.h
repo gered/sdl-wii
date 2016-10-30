@@ -135,6 +135,9 @@ typedef struct SDL_Surface {
 #define SDL_SRCALPHA	0x00010000	/* Blit uses source alpha blending */
 #define SDL_PREALLOC	0x01000000	/* Surface uses preallocated memory */
 
+/* **** added specifically for use with SDL-Wii, used with SDL_SetVideoMode() **** */
+#define SDL_USE240P     0x02000000  /* if using 320x240, use a 240p TV video mode */
+
 /* Evaluates to true if the surface needs to be locked before access */
 #define SDL_MUSTLOCK(surface)	\
   (surface->offset ||		\

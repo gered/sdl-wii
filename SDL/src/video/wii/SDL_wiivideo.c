@@ -318,13 +318,58 @@ void PickWiiVideoMode(GXRModeObj **picked_mode, int width, int height, Uint32 fl
 {
 	*picked_mode = NULL;
 
-	if (height == 240)
+	if (height == 240 && (flags & SDL_USE240P))
 	{
-		*picked_mode = &TVNtsc240Ds;
+		// implementation based on libogc's VIDEO_GetPreferredMode
+		// 
+		// TODO: i do not have access to PAL hardware and have only tested this
+		//       for NTSC 240p modes. i assume that this should work for PAL, 
+		//       but it might not!
+
+		#if defined(HW_RVL)
+			u32 tvmode = CONF_GetVideo();
+			switch (tvmode)
+			{
+				case CONF_VIDEO_NTSC:
+					*picked_mode = &TVNtsc240Ds;
+					break;
+				case CONF_VIDEO_PAL:
+					if (CONF_GetEuRGB60() > 0)
+						*picked_mode = &TVEurgb60Hz240Ds;
+					else
+						*picked_mode = &TVPal264Ds;
+					break;
+				case CONF_VIDEO_MPAL:
+					*picked_mode = &TVMpal240Ds;
+					break;
+				default:
+					*picked_mode = &TVNtsc240Ds;
+			}
+		#else
+			u32 tvmode = VIDEO_GetCurrentTvMode();
+			switch (tvmode)
+			{
+				case VI_NTSC:
+					*picked_mode = &TVNtsc240Ds;
+					break;
+				case VI_PAL:
+					*picked_mode = &TVPal264Ds;
+					break;
+				case VI_MPAL:
+					*picked_mode = &TVMpal240Ds;
+					break;
+				case VI_EURGB60:
+					*picked_mode = &TVEurgb60Hz240Ds;
+					break;
+				default:
+					*picked_mode = &TVNtsc240Ds;
+			}
+		#endif
 	}
-	else if (height == 480)
+	else if (height == 240 || height == 480)
 	{
-		*picked_mode = &TVNtsc480Int;
+		// fall back to whatever libogc decides to use (either 480i or 480p)
+		*picked_mode = VIDEO_GetPreferredMode(NULL);
 	}
 }
 
