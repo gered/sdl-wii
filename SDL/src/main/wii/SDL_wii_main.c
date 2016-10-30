@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
 	SYS_SetResetCallback(ResetCB);
 #endif
 	PAD_Init();
-	WII_InitVideoSystem();
+	//WII_InitVideoSystem();
 #ifdef HW_RVL
 	WPAD_SetDataFormat(WPAD_CHAN_ALL,WPAD_FMT_BTNS_ACC_IR);
 	WPAD_SetVRes(WPAD_CHAN_ALL, 640, 480);

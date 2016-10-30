@@ -275,7 +275,22 @@ StartVideoThread()
 
 static int WII_VideoInit(_THIS, SDL_PixelFormat *vformat)
 {
-	// Set up the modes.
+	VIDEO_Init();
+
+	// VIDEO_GetPreferredMode will basically always return 480p or 480i (or 
+	// the PAL equivalents). since we're only allowing 640x480 and 320x240 
+	// SDL video modes, we can just use the 480p/480i video mode framebuffer 
+	// properties to configure our SDL list of allowed video modes.
+	// 
+	// the (eventual) call to SDL_SetVideoMode will reset vmode to something
+	// more closely matching the flags provided and the width/height
+	// requested (e.g. use real 240p for 320x240 instead of scaling up 2x and 
+	// always using 480p or 480i ... unless the flags used call for that 
+	// specifically!)
+	vmode = VIDEO_GetPreferredMode(NULL);
+
+	// set up the list of supported SDL video modes (which will be checked against
+	// in calls to SDL_SetVideoMode)
 	mode_640.w = vmode->fbWidth;
 	mode_640.h = vmode->efbHeight;
 	mode_320.w = mode_640.w / 2;
@@ -297,6 +312,20 @@ static int WII_VideoInit(_THIS, SDL_PixelFormat *vformat)
 static SDL_Rect **WII_ListModes(_THIS, SDL_PixelFormat *format, Uint32 flags)
 {
 	return &modes_descending[0];
+}
+
+void PickWiiVideoMode(GXRModeObj **picked_mode, int width, int height, Uint32 flags)
+{
+	*picked_mode = NULL;
+
+	if (height == 240)
+	{
+		*picked_mode = &TVNtsc240Ds;
+	}
+	else if (height == 480)
+	{
+		*picked_mode = &TVNtsc480Int;
+	}
 }
 
 static SDL_Surface *WII_SetVideoMode(_THIS, SDL_Surface *current,
@@ -332,6 +361,15 @@ static SDL_Surface *WII_SetVideoMode(_THIS, SDL_Surface *current,
 			bpp);
 		return NULL;
 	}
+
+	PickWiiVideoMode(&vmode, width, height, flags);
+	if (vmode == NULL)
+	{
+		SDL_SetError("Could not select suitable WII video mode.");
+		return NULL;
+	}
+
+	WII_InitVideoSystem();
 
 	bytes_per_pixel = bpp / 8;
 
@@ -775,7 +813,10 @@ WII_InitVideoSystem()
 {
 	/* Initialise the video system */
 	VIDEO_Init();
-	vmode = VIDEO_GetPreferredMode(NULL);
+
+	// assumes vmode has been pre-filled (WII_SetVideoMode does this for valid video mode parameters)
+	if (vmode == NULL)
+		return;
 
 	/* Set up the video system with the chosen mode */
 	VIDEO_Configure(vmode);
